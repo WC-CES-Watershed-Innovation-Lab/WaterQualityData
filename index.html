@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Quality Data</title>
+</head>
+<body>
+    <h1>Millington Creek</h1>
+    <p>This is my GitHub Pages website.</p>
+    
+    <div id="header-placeholder"></div>
+    <main>
+        <!-- Your main page content goes here -->
+        <p>Welcome to Millington Creek!</p>
+    </main>
+
+    <!-- JavaScript to fetch and include the header -->
+    <script>
+        fetch('/docs/Millington%20AquaTroll/DO.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('header-placeholder').innerHTML = html;
+            });
+    </script>
+  
+</body>
+</html>
