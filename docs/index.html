@@ -4,109 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Water Quality Dashboard</title>
-    <style>
+     <style>
         body { font-family: Arial, sans-serif; margin: 2rem; text-align: center; }
         iframe { width: 90%; height: 600px; border: none; margin-top: 1rem; }
-
-        .location-buttons button{
-            padding: 10px 20px;
-            margin: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-         
     </style>
 </head>
-    
 <body>
-    <h1>Water Quality Dashboard</h1>
+    <div class="tab">
+      <button class="tablinks" onclick="changeLoc(event, 'Millington')">Millington</button>
+      <button class="tablinks" onclick="changeLoc(event, 'Morgan Creek')">Morgan Creek</button>
+    </div>
+   <h1>Millington AquaTroll Dashboard</h1>
 
-    <div class="location-buttons">
-        <button onclick="loadLocation('Millington')">Millington AquaTroll</button>
-        <button onclick="loadLocation('Morgan Creek')">Morgan Creek AquaTroll</button>
-        <!-- Add more buttons here -->
-    </div>    
+    <!-- Tab content -->
+    <div id='Millington' class='tabcontent'>
+        <h3>Millington</h3>
+        <label for="graphSelect">Select a parameter:</label>
+        <select id="graphSelect" onchange="updateGraph()">
+            <option value="">-- Choose a graph --</option>
+            <option value="Millington%20AquaTroll/Actual%20Conductivity.html">Actual Conductivity</option>
+            <option value="Millington%20AquaTroll/Specific%20Conductivity.html">Specific Conductivity</option>
+            <option value="Millington%20AquaTroll/Salinity.html">Salinity</option>
+            <option value="Millington%20AquaTroll/Resistivity.html">Resistivity</option>
+            <option value="Millington%20AquaTroll/Density.html">Density</option>
+            <option value="Millington%20AquaTroll/Total%20Dissolved%20Solids.html">Total Dissolved Solids</option>
+            <option value="Millington%20AquaTroll/Chl-a%20Fluorescence.html">Chl-a Fluorescence</option>
+            <option value="Millington%20AquaTroll/Chl-a%20Concentration.html">Chl-a Concentration</option>
+            <option value="Millington%20AquaTroll/Turbidity.html">Turbidity</option>
+            <option value="Millington%20AquaTroll/Total%20Suspended%20Solids.html">Total Suspended Solids</option>
+            <option value="Millington%20AquaTroll/Temperature.html">Temperature</option>
+            <option value="Millington%20AquaTroll/External%20Voltage.html">External Voltage</option>
+            <option value="Millington%20AquaTroll/Pressure.html">Pressure</option>
+            <option value="Millington%20AquaTroll/Depth.html">Depth</option>
+            <option value="Millington%20AquaTroll/pH.html">pH</option>
+            <option value="Millington%20AquaTroll/pH%20MV.html">pH MV</option>
+            <option value="Millington%20AquaTroll/ORP.html">ORP</option>
+            <option value="Millington%20AquaTroll/DO.html">DO</option>
+            <option value="Millington%20AquaTroll/%25%20Saturation%20O₂.html">% Saturation O₂</option>
+            <option value="Millington%20AquaTroll/Partial%20Pressure%20O₂.html">Partial Pressure O₂</option>
+            <option value="Millington%20AquaTroll/Level%20Depth%20to%20Water.html">Level Depth to Water</option>
+            <option value="Millington%20AquaTroll/Level%20Elevation.html">Level Elevation</option>
+        </select>
+    
+        <iframe id="graphFrame"></iframe>
+    </div>
 
-    <h2 id="locationTitle">Choose a Location</h2>
-
-    <!-- Dropdown for Graphs -->
-    <label for="graphSelect">Select a parameter:</label>
-    <select id="graphSelect" onchange="updateGraph()">
-        <option value=""> Select a location first  </option>
-    </select>
-
-    <iframe id="graphFrame"></iframe>
-
+    <div id='Morgan Creek' class='tabcontent'>
+        <h3>Morgan Creek</h3>
+        <label for="graphSelect">Select a parameter:</label>
+        <select id="graphSelect" onchange="updateGraph()">
+            <option value="Morgan%20Creek%20AquaTroll"/Actual%20Conductivity.html">Actual Conductivity</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Specific%20Conductivity.html">Specific Conductivity</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Salinity.html">Salinity</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Resistivity.html">Resistivity</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Density.html">Density</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Total%20Dissolved%20Solids.html">Total Dissolved Solids</option>
+            <option value="Morgan%20Creek%20AquaTroll"/pH.html">pH</option>
+            <option value="Morgan%20Creek%20AquaTroll"/pH%20MV.html">pH MV</option>
+            <option value="Morgan%20Creek%20AquaTroll"/ORP.html">ORP</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Turbidity.html">Turbidity</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Temperature.html">Temperature</option>
+            <option value="Morgan%20Creek%20AquaTroll"/External%20Voltage.html">External Voltage</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Battery%20Level.html">Battery Level</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Baro.html">Baro</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Pressure.html">Pressure</option>
+            <option value="Morgan%20Creek%20AquaTroll"/Depth.html">Depth</option>
+        </select>
+    
+        <iframe id="graphFrame"></iframe>
+    </div>
+    
     <script>
-        const graphs = {
-            "Morgan Creek" : [
-                ["Actual Conductivity", "Morgan%20Creek%20AquaTroll/Actual%20Conductivity.html"],
-                ["Specific Conductivity", "Morgan%20Creek%20AquaTroll/Specific%20Conductivity.html"],
-                ["Salinity", "Morgan%20Creek%20AquaTroll/Salinity.html"],
-                ["Resistivity", "Morgan%20Creek%20AquaTroll/Resistivity.html"],
-                ["Density", "Morgan%20Creek%20AquaTroll/Density.html"],
-                ["Total Dissolved Solids", "Morgan%20Creek%20AquaTroll/Total%20Dissolved%20Solids.html"],
-                ["pH", "Morgan%20Creek%20AquaTroll/pH.html"],
-                ["pH MV", "Morgan%20Creek%20AquaTroll/pH%20MV.html"],
-                ["ORP", "Morgan%20Creek%20AquaTroll/ORP.html"],
-                ["Turbidity", "Morgan%20Creek%20AquaTroll/Turbidity.html"],
-                ["Temperature", "Morgan%20Creek%20AquaTroll/Temperature.html"],
-                ["External Voltage", "Morgan%20Creek%20AquaTroll/External%20Voltage.html"],
-                ["Battery Level", "Morgan%20Creek%20AquaTroll/Battery%20Level.html"],
-                ["Baro", "Morgan%20Creek%20AquaTroll/Baro.html"],
-                ["Pressure", "Morgan%20Creek%20AquaTroll/Pressure.html"],
-                ["Depth", "Morgan%20Creek%20AquaTroll/Depth.html"]
-            ],
-
-            "Millington" : [
-                ["Actual Conductivity", "Millington%20AquaTroll/Actual%20Conductivity.html"],
-                ["Specific Conductivity", "Millington%20AquaTroll/Specific%20Conductivity.html"],
-                ["Salinity", "Millington%20AquaTroll/Salinity.html"],
-                ["Resistivity", "Millington%20AquaTroll/Resistivity.html"],
-                ["Density", "Millington%20AquaTroll/Density.html"],
-                ["Total Dissolved Solids", "Millington%20AquaTroll/Total%20Dissolved%20Solids.html"],
-                ["Chl-a Fluorescence", "Millington%20AquaTroll/Chl-a%20Fluorescence.html"],
-                ["Chl-a Concentration", "Millington%20AquaTroll/Chl-a%20Concentration.html"],
-                ["Turbidity", "Millington%20AquaTroll/Turbidity.html"],
-                ["Total Suspended Solids", "Millington%20AquaTroll/Total%20Suspended%20Solids.html"],
-                ["Temperature", "Millington%20AquaTroll/Temperature.html"],
-                ["External Voltage", "Millington%20AquaTroll/External%20Voltage.html"],
-                ["Pressure", "Millington%20AquaTroll/Pressure.html"],
-                ["Depth", "Millington%20AquaTroll/Depth.html"],
-                ["pH", "Millington%20AquaTroll/pH.html"],
-                ["pH MV", "Millington%20AquaTroll/pH%20MV.html"],
-                ["ORP", "Millington%20AquaTroll/ORP.html"],
-                ["DO", "Millington%20AquaTroll/DO.html"],
-                ["% Saturation O₂", "Millington%20AquaTroll/%%20Saturation%20O₂.html"],
-                ["Partial Pressure O₂", "Millington%20AquaTroll/Partial%20Pressure%20O₂.html"],
-                ["Level Depth to Water", "Millington%20AquaTroll/Level%20Depth%20to%20Water.html"],
-                ["Level Elevation", "Millington%20AquaTroll/Level%20Elevation.html"]
-            ]
-        };
-
-        // 🔵 Called when user clicks a location button
-        function loadLocation(locationName) {
-            document.getElementById("locationTitle").textContent = locationName;
-
-            const dropdown = document.getElementById("graphSelect");
-            dropdown.innerHTML = "";  // Clear previous
-
-            dropdown.innerHTML = `<option value="">-- Choose a graph --</option>`;
-
-            graphs[locationName].forEach(item => {
-                const opt = document.createElement("option");
-                opt.value = item[1];
-                opt.textContent = item[0];
-                dropdown.appendChild(opt);
-            });
-
-            document.getElementById("graphFrame").src = ""; // clear iframe
-        }
-
         function updateGraph() {
             const frame = document.getElementById("graphFrame");
             const select = document.getElementById("graphSelect");
             frame.src = select.value;
+        }
+
+        function changeLoc(evt, locName) {
+            // Declare variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class = 'tabcontent' and hide them
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Show current tab and add an "active" class to the button that opened the tab
+            document.getElementById(locName).style.display = "block";
+            evt.currentTarget.className += " active";
         }
     </script>
 </body>
