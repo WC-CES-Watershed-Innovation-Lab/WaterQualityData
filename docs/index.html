@@ -54,6 +54,7 @@
         <button class="tablinks" onclick="changeLoc(event, 'SECreek')">Southeast Creek</button>
         <button class="tablinks" onclick="changeLoc(event, 'Shipyard')">Shipyard Landing</button>
         <button class="tablinks" onclick="changeLoc(event, 'UELangford')">Upper East Langford</button>
+        <button class="tablinks" onclick="changeLoc(event, 'Radcliffe')">Radcliffe Outflow</button>
     </div>
    <h1> Water Quality Dashboard</h1>
 
@@ -223,6 +224,32 @@
         </select>
     
         <iframe id="UELangfordFrame"></iframe>
+    </div>
+
+    <div id='Radcliffe' class='tabcontent'>
+        <h3>Radcliffe Outflow</h3>
+        <label for="graphSelect">Select a parameter:</label>
+        <select id="radcliffeSelect" onchange="updateGraph('radcliffeFrame', 'radcliffeSelect')">
+            <option value="">-- Choose a graph --</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/pH.html">pH</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/pH%20MV.html">pH MV</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/ORP.html">ORP</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Turbidity.html">Turbidity</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Temperature.html">Temperature</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Actual%20Conductivity.html">Actual Conductivity</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Specific%20Conductivity.html">Specific Conductivity</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Salinity.html">Salinity</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Resistivity.html">Resistivity</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Density.html">Density</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Total%20Dissolved%20Solids.html">Total Dissolved Solids</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/External%20Voltage.html">External Voltage</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Pressure.html">Pressure</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Depth.html">Depth</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Level%20Depth%20to%20Water.html">Level Depth to Water</option>
+            <option value="Radcliffe%20Outflow%20AquaTroll/Level%20Elevation.html">Level Elevation</option>
+        </select>
+    
+        <iframe id="radcliffeFrame"></iframe>
     </div>
 
     
