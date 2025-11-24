@@ -164,6 +164,33 @@
     
         <iframe id="SECreekFrame"></iframe>
     </div>
+
+    <div id='shipyard' class='tabcontent'>
+        <h3>Shipyard Landing</h3>
+        <label for="graphSelect">Select a parameter:</label>
+        <select id="shipyardSelect" onchange="updateGraph('shipyardFrame', 'shipyardSelect')">
+            <option value="">-- Choose a graph --</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Actual%20Conductivity.html">Actual Conductivity</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Specific%20Conductivity.html">Specific Conductivity</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Salinity.html">Salinity</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Resistivity.html">Resistivity</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Density.html">Density</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Total%20Dissolved%20Solids.html">Total Dissolved Solids</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/pH.html">pH</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/pH%20MV.html">pH MV</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/ORP.html">ORP</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/DO.html">DO</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/%%20Saturation%20O₂.html">% Saturation O₂</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Partial%20Pressure%20O₂.html">Partial Pressure O₂</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Turbidity.html">Turbidity</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Temperature.html">Temperature</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/External%20Voltage.html">External Voltage</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Pressure.html">Pressure</option>
+            <option value="Shipyard%20Landing%20Dock%20AquaTroll/Depth.html">Depth</option>
+        </select>
+    
+        <iframe id="shipyardFrame"></iframe>
+    </div>
     
     <script>
         function updateGraph(frameId, selectId) {
