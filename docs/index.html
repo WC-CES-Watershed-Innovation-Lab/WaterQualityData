@@ -48,8 +48,11 @@
     
 <body>
     <div class="tab">
-      <button class="tablinks" onclick="changeLoc(event, 'Millington')">Millington</button>
-      <button class="tablinks" onclick="changeLoc(event, 'MorganCreek')">Morgan Creek</button>
+        <button class="tablinks" onclick="changeLoc(event, 'Millington')">Millington</button>
+        <button class="tablinks" onclick="changeLoc(event, 'MorganCreek')">Morgan Creek</button>
+        <button class="tablinks" onclick="changeLoc(event, 'MaryBee')">Mary Bee Gaines</button>
+        <button class="tablinks" onclick="changeLoc(event, 'SECreek')">Southeast Creek</button>
+        <button class="tablinks" onclick="changeLoc(event, 'Shipyard')">Shipyard Landing</button>
     </div>
    <h1> Water Quality Dashboard</h1>
 
@@ -165,7 +168,7 @@
         <iframe id="SECreekFrame"></iframe>
     </div>
 
-    <div id='shipyard' class='tabcontent'>
+    <div id='Shipyard' class='tabcontent'>
         <h3>Shipyard Landing</h3>
         <label for="graphSelect">Select a parameter:</label>
         <select id="shipyardSelect" onchange="updateGraph('shipyardFrame', 'shipyardSelect')">
