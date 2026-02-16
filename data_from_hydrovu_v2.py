@@ -11,7 +11,13 @@ from datetime import datetime, timedelta
 import plotly.express as px
 import plotly.io as pio
 import os
+import glob
 import sys
+import time
+import base64
+from io import BytesIO, StringIO
+
+start_time = time.time()
 sys.setrecursionlimit(10000) # Increase the limit to 10000
 pio.renderers.default = 'browser' #determines how plot displays
 
@@ -141,10 +147,10 @@ def get_locations():
 
 # Calculates the epoch time of a past date, set the past date by adjusting days=
 # Theoretically, enables us to get data between a past date and present, but HydroVu API isn't quite behaving that way
-def get_dates():
+def get_dates(days_ago):
     date_now   = datetime.now()
     now_epoch  = date_now.timestamp()
-    past_date  = date_now - timedelta(days=14)
+    past_date  = date_now - timedelta(days=days_ago)
     past_epoch = past_date.timestamp()
     return int(now_epoch), int(past_epoch)
 
@@ -170,8 +176,8 @@ def make_one_call(desired_location, parameters):
 # In[19]:
 
 
-def loop_by_date(desired_location):
-    now_date, start_date = get_dates()
+def loop_by_date(desired_location, now_date, start_date):
+    #now_date, start_date = get_dates(num_days)
 
     response_list = []
     checked_dates = [] # Anti infinite loop control
@@ -246,7 +252,7 @@ dict3 = {}
 for key in dict1:
     dict3[key] = dict1[key] + dict2[key]
 
-print(dict3)
+#print(dict3)
 
 
 # In[23]:
@@ -258,48 +264,120 @@ print(dict3)
 # Returns the list of keys and the dictionary of dfs; use the key list to access the combined_dfs
 def merge_dfs(dict_list):
     key_list = []
-    for key in dict_list[0]: # only ckecks the keys in the first dictionary item, which may lead to a key mismatch
-        key_list.append(key)
-        
+    for d in dict_list: # Runs through all dictionaries and grabs their keys
+        dict_keys = d.keys() # Creates a list object with keys
+        for key in dict_keys:
+            key_list.append(key) # Breaks up the dict_keys list into individual keys
+   
+    key_list = set(key_list) # Gets only unique values in the list
+    
     combined_dfs = {}
-    for key in key_list:
-        for dict in dict_list:
-            if key in combined_dfs:
-                combined_dfs[key] = pd.concat([combined_dfs[key], dict[key]], ignore_index=True)
-            else:
-                combined_dfs[key] = dict[key]
-    return key_list, combined_dfs
+    
+    for key in key_list: # Loops through each key and concats dicts key-wise
+        dfs_to_concat = []
+        for d in dict_list:
+            if key in d:
+                dfs_to_concat.append(d[key])
+        
+        if dfs_to_concat:
+            combined_dfs[key] = pd.concat(dfs_to_concat, ignore_index=True)
+        
+    return list(key_list), combined_dfs
 
+
+fake_list = [1, 1, 3, 4, 5, 6, 7, 7, 8, 9]
+print(set(fake_list))
+
+car = {
+  "brand": "Ford",
+  "model": "Mustang",
+  "year": 1964
+}
+
+x = car.keys()
+print(x)
+for key in x:
+    print(key)
 
 # In[24]:
 
+def build_csv(loc, how_many_days_ago):
+    date_now, date_past = get_dates(how_many_days_ago)
+    responses = loop_by_date(loc, date_now, date_past)
+    response_dict_list = process_responses(responses) # Returns a blank list, [], if the site has no data w/in date range
+    if response_dict_list != []:
+        keys, loc_dfs = merge_dfs(response_dict_list)
+        print(loc_dfs)
+        for df in loc_dfs.values():
+            df.to_csv(f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}\\{df.iloc[0,2]}.csv")
+            #df.to_csv(r"C:\Users\GIS\MichaelHudak projects\HydroVu_Location_Params\Mary Bee Gaines Dock AquaTroll")
+    else:
+        print(f"No data in timeframe for {loc}")
+        
+#build_csv("Mary Bee Gaines Dock AquaTroll")
 
-# radcliffe = loop_by_date("Radcliffe Outflow AquaTroll")
-# mbg = loop_by_date("Mary Bee Gaines Dock AquaTroll")
-# mbg_dict_list = process_responses(mbg)
-# mbg_keys, mbg_dfs = merge_dfs(mbg_dict_list)
-# print(radcliffe)
-# print(mbg_dict_list)
 
+# In[]:
+    
+def update_csv(loc):
+    folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}"
+    all_files = glob.glob(os.path.join(folder_path, "*.csv"))
+    final_date_list = []
+    for filename in all_files:
+        df = pd.read_csv(filename, header=0)
+        last_date = df.iloc[-1, 1]
+        final_date_list.append(last_date)
+        #print(last_date)
+        
+    most_recent_date = max(final_date_list)
+    responses = loop_by_date(loc, datetime.now().timestamp(), most_recent_date) 
+    response_dict_list = process_responses(responses)
+    keys, loc_dfs = merge_dfs(response_dict_list)
+    
+    for df in loc_dfs.values():
+        df.to_csv(f"{folder_path}\\{df.iloc[0,2]}.csv", mode='a', index=True, header=False)
+        
+update_csv("Mary Bee Gaines Dock AquaTroll")
+
+# In[]:
+    
 
 # In[25]:
 
+# for loc in location_ids:
+#     build_csv(loc, 500)
 
-loc_data_dict = {}
-for loc in location_ids:
-    responses = loop_by_date(loc)
-    response_dict_list = process_responses(responses) # Returns a blank list, [], if the site has no data w/in date range
-    if response_dict_list == []:
-        continue
-    else:
-        keys, loc_dfs = merge_dfs(response_dict_list)
-        loc_data_dict.update({loc : loc_dfs})
+# for loc in location_ids:
+#     update_csv(loc)
+
+
+# This code is great & functional for just getting the previous 2 weeks,
+# but has nothing to do with the csv pathway
+# loc_data_dict = {}
+# for loc in location_ids:
+#     responses = loop_by_date(loc, 14)
+#     response_dict_list = process_responses(responses) # Returns a blank list, [], if the site has no data w/in date range
+#     if response_dict_list == []:
+#         continue
+#     else:
+#         keys, loc_dfs = merge_dfs(response_dict_list)
+#         #
+#         loc_data_dict.update({loc : loc_dfs})
 
 
 # In[26]:
 
-
-print(loc_data_dict)
+def dfs_from_csvs(loc):
+    folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}"
+    try:
+        all_files = glob.glob(os.path.join(folder_path, "*.csv"))
+        df_list = []
+        for filename in all_files:
+            df = pd.read_csv(filename, header=0)
+            df_list.append(df)
+        return df_list
+    except:
+        print(f"{loc} csvs do not exist")
 
 
 # In[27]:
@@ -508,8 +586,7 @@ access_token = update_access_token()
 # In[57]:
 
 
-import base64
-from io import BytesIO, StringIO
+
 
 
 # In[85]:
@@ -591,6 +668,8 @@ def convert_dates(time_array):
         new_dates.append(local_datetime)
     return new_dates
 
+# In[]:
+    
 
 # In[71]:
 
@@ -620,6 +699,28 @@ def plotly_bytes(df, loc, param, unit):
 
 # # Below print out strings necessary for html page setup
 
+
+# In[]:
+
+"""
+Must uncomment for loop codes for full functionality.
+ - change the number in the buil_csv loop decide how many days in the past to start the csv
+ - only run build_csv for a new location, or if an old location's csv gets deleted
+ - the update_csv loop must be run before the plotly_bytes loop can have any effect
+"""
+# for loc in location_ids:
+#     build_csv(loc, 500)
+
+# for loc in location_ids:
+#     update_csv(loc)
+
+for loc in location_ids:
+    dfs_to_convert = dfs_from_csvs(loc) # NoneType if no csv exists
+    if dfs_to_convert:
+        for df in dfs_to_convert:
+            param_name = df.iloc[0,3]
+            unit_name = df.iloc[0,4]
+            plotly_bytes(df, loc, param_name, unit_name)
 # In[ ]:
 
 
@@ -666,24 +767,24 @@ def plotly_bytes(df, loc, param, unit):
 # In[87]:
 
 
-def run_all(dict):
-    for key,value in dict.items():
-        for unit_key, df_value in value.items():
-            param_name = df_value.iloc[0,2]
-            unit_name = df_value.iloc[0,3]
-            plotly_bytes(df_value, key, param_name, unit_name)
+# def run_all(d):
+#     for key,value in dict.items():
+#         for unit_key, df_value in value.items():
+#             param_name = df_value.iloc[0,2]
+#             unit_name = df_value.iloc[0,3]
+#             plotly_bytes(df_value, key, param_name, unit_name)
 
 
 # In[89]:
 
 
-run_all(loc_data_dict)
+#run_all(loc_data_dict)
 
 
 # In[ ]:
 
 
-print(loc_data_dict)
+#print(loc_data_dict)
 
 
 # In[ ]:
@@ -698,7 +799,7 @@ print(loc_data_dict)
 # In[ ]:
 
 
-run_all(loc_data_dict)
+#run_all(loc_data_dict)
 
 
 # In[ ]:
@@ -739,4 +840,5 @@ run_all(loc_data_dict)
 # response = requests.put(url, headers=headers, json=git_body_params)
 # response.raise_for_status()
 # print(response.json())
+print("--- %s seconds ---" % (time.time() - start_time))
 
