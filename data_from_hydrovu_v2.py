@@ -701,7 +701,13 @@ def plotly_bytes(df, loc, param, unit):
 
 
 # In[]:
-    
+
+"""
+Must uncomment for loop codes for full functionality.
+ - change the number in the buil_csv loop decide how many days in the past to start the csv
+ - only run build_csv for a new location, or if an old location's csv gets deleted
+ - the update_csv loop must be run before the plotly_bytes loop can have any effect
+"""
 # for loc in location_ids:
 #     build_csv(loc, 500)
 
@@ -835,3 +841,4 @@ for loc in location_ids:
 # response.raise_for_status()
 # print(response.json())
 print("--- %s seconds ---" % (time.time() - start_time))
+
