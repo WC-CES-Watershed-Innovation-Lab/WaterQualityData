@@ -1,25 +1,29 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+"""
+HydroVu API documentation: https://www.hydrovu.com/public-api/docs/index.html
+"""
+
 # In[1]:
 
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import requests
-from datetime import datetime, timedelta
-import plotly.express as px
-import plotly.io as pio
-import os
-import glob
-import sys
-import time
-import base64
-from io import BytesIO, StringIO
+import pandas as pd # Dataframes, reads CSVs into dataframes
+import matplotlib.pyplot as plt # Available for quick plotting
+import requests # Connects with HydroVu and GitHub for data calls and uploads
+from datetime import datetime, timedelta # Converts epoch time from raw data, sets start date when building CSVs
+import plotly.express as px # Interactive graph display that gets sent to GitHub
+#import plotly.io as pio
+import os # Enables viewing external files
+import glob # Enables grabbing all files in a folder
+#import sys 
+import time # Tracks code runtime and prints at the end of run
+import base64 # Encoding necessary to upload html to GitHub
+from io import BytesIO, StringIO # Enables treating a string like a file object for GitHub upload
 
 start_time = time.time()
-sys.setrecursionlimit(10000) # Increase the limit to 10000
-pio.renderers.default = 'browser' #determines how plot displays
+#sys.setrecursionlimit(10000) # Increase the limit to 10000
+#pio.renderers.default = 'browser' #determines how plot displays
 
 
 # ## Prologue
@@ -28,21 +32,18 @@ pio.renderers.default = 'browser' #determines how plot displays
 
 
 # These must be defined before running the code
-LOCAL_CLIENT_ID = ""
-LOCAL_CLIENT_SECRET = ""
+LOCAL_CLIENT_ID = "" # found in HydroVu website
+LOCAL_CLIENT_SECRET = "" # found in HydroVu website
+# git token must be generated in GitHub
 LOCAL_GIT_TOKEN = ""
 
-
-# In[6]:
-
-
+# HydroVu endpoints are necessary for calling data from HydroVu, found in HydrVu API docs
 LOCAL_LOCATIONS_ENDPOINT = "https://hydrovu.com/public-api/v1/locations/list"
 LOCAL_OAUTH_ENDPOINT     = "https://hydrovu.com/public-api/oauth/token"
 LOCAL_DATA_ENDPOINT      = "https://hydrovu.com/public-api/v1/locations/"
 
 
 # In[7]:
-
 
 # Location IDs dict enables easy transition between site codes and readable site names
 location_ids = {
@@ -59,8 +60,9 @@ location_ids = {
 
 # In[8]:
 
-
-#Establish parameter and unit dicts to join friendly names with HydroVu codes
+# Establish parameter and unit dicts to join friendly names with HydroVu codes
+# HydroVu uses numeric codes for parameters and units, 
+# so these dictionaries help convert codes into meaningful names
 parameter_df = pd.read_csv("C:/Users/GIS/MichaelHudak projects/WIL monitor locations - parameter IDs.csv", header=0)
 parameter_dict = {row["key_col"]:row["value_col"] for i, row in parameter_df.iterrows()}
 
@@ -69,15 +71,13 @@ unit_df = pd.read_csv("C:/Users/GIS/MichaelHudak projects/WIL monitor locations 
 unit_dict = {row["key_col"]:row["value_col"] for i, row in unit_df.iterrows()}
 
 
-# In[ ]:
-
-# ## SECTION 1
-
-# ## 1. Update Access Token
 
 # In[11]:
-
-
+"""
+Use HydroVu client info to get a temporary access token.
+HydroVu access token expire relatively quickly, so this should be updated with 
+each run.
+"""
 def update_access_token():
     headers_for_auth = {#headers to get an authentication token
         "grant_type" : "client_credentials",
@@ -92,27 +92,21 @@ def update_access_token():
     return(tokens["access_token"])
 
 
-# In[12]:
+#access_token = update_access_token()
 
-access_token = update_access_token()
-
-# In[13]:
-
-
-#Sets up authentication header
+#Sets up authentication header using access token
 headers_for_data = {
     "Authorization" : f"Bearer {update_access_token()}",
     "User-Agent" : LOCAL_CLIENT_ID
     }
 
 
-# ## 2. Get Active Locations
-
 # In[15]:
 
 
-#Only run this to update the dictionary of locations
-#This only gets first ten locations; use the web interface api instead
+# Only run this to update the dictionary of locations
+# This only gets first ten locations; use the web interface api instead
+
 def get_locations():
     response = requests.get(url=LOCAL_LOCATIONS_ENDPOINT, headers=headers_for_data)
     response.raise_for_status()
@@ -121,13 +115,12 @@ def get_locations():
     return locations
 
 
-# ## 3. Get Data by Looping Dates
-
 # In[17]:
-
-
-# Calculates the epoch time of a past date, set the past date by adjusting days=
-# Theoretically, enables us to get data between a past date and present, but HydroVu API isn't quite behaving that way
+"""
+Calculates the epoch time of a past date, 
+set with an input of the number of days into the past.
+Returns two epoch times: the present epoch time, and the epoch time of the designated past day
+"""
 def get_dates(days_ago):
     date_now   = datetime.now()
     now_epoch  = date_now.timestamp()
@@ -138,11 +131,11 @@ def get_dates(days_ago):
 
 # In[18]:
 
-
 # Makes a single API call for a given location with parameters(page, date)
-def make_one_call(desired_location, parameters):
+def make_one_call(desired_location, header_parameters):
+    # Constructs a unique url using the LOCAL_DATA_ENDPOINT variable and desired_location input
     response = requests.get(url=f"{LOCAL_DATA_ENDPOINT}{location_ids[desired_location]}/data",
-                            headers=headers_for_data, params=parameters)
+                            headers=headers_for_data, params=header_parameters)
     
     # Instead of raising an error, the function returns just a "null" value,
     # which the dependent functions can handle
@@ -155,19 +148,35 @@ def make_one_call(desired_location, parameters):
 
 
 # In[19]:
+"""
+The following functions are all very interconnected: loop_by_date(), extract_param_data(),
+process_responses(), and merge_dfs(). First, loop_by_date() iterates through all of the data in
+our specified date range. loop_by_date() stores all of the API call results in the response_list. 
+So, the response_list is a list of complex dictionary items that contain timestamp and value pairs
+for each parameter, but each dictionary is organized by timestamp and contains accessory information.
+Then, extract_param_data() sorts through the complex response_list and organizes a new dictionary, results,
+into parameter dataframes by page. (Remember, each page is only about 120 datapoints, which spans about
+2 days. Response will be a list of dictionaries, where there is a dictionary for each data page, and
+each dictionary consists of parameter_id code keys matched with organized, 1-parameter dataframe values.)
+process_responses() runs the previous two functions in a logically-sound way. Finally, merge_dfs takes the 
+list of page-separated parameter dictionaries and merges them into full parameter dataframes. That is, 
+the final output includes the combined_dfs dictionary, which for the given location over our specified
+time frame, consists of all paramaters with each parameter in its own singular dataframe.
+"""
 
-
+# Establishes logic to make continuous HydroVu API calls by looping through data date-wise
+# HydroVu only returns about 120 data points with each request, so we need to loop multiple requests
 def loop_by_date(desired_location, now_date, start_date):
 
     response_list = []
     checked_dates = [] # Anti infinite loop control
-    while start_date < now_date:
+    while start_date < now_date: # start_date must be some epoch date in the past
         #print("start_date: ", datetime.fromtimestamp(start_date))
-        parameters = {
+        header_parameters = {
             "startTime" : start_date, 
         }
-        r = make_one_call(desired_location, parameters)
-        if r == "null":
+        r = make_one_call(desired_location, header_parameters)
+        if r == "null": # if the make_one_call() does not return any data, stop looping
             break
         response_list.append(r)
         checked_dates.append(start_date)
@@ -176,7 +185,7 @@ def loop_by_date(desired_location, now_date, start_date):
         end_date = response_data["parameters"][0]["readings"][-1]["timestamp"]
         
         start_date = end_date
-        if start_date in checked_dates:
+        if start_date in checked_dates: # if the next loop would check a date that we've already checked
             break
 
     return response_list
@@ -190,10 +199,11 @@ def extract_param_data(loc_data):
     loc_id = loc_data["locationId"]
     results = {}
     
-    for param in loc_data["parameters"]:
+    for param in loc_data["parameters"]: # Loops through all parameters
         pid = param["parameterId"]
-
-        df = pd.DataFrame(param["readings"])
+        
+        # Creates a dataframe based on the timestamp-value pairs for each parameter
+        df = pd.DataFrame(param["readings"]) 
         
         df["param_name"] = parameter_dict[pid]
         df["unit_name"] = unit_dict[param["unitId"]]
@@ -252,37 +262,41 @@ def merge_dfs(dict_list):
 
 # In[24]:
 
-def build_csv(loc, how_many_days_ago):
-    date_now, date_past = get_dates(how_many_days_ago)
+    
+# Run this to build a csv for a location that does not have a csv yet
+def build_csv(loc, how_many_days_ago): # how many days in the past should we grab data for
+    date_now, date_past = get_dates(how_many_days_ago) # gets actual date values
     responses = loop_by_date(loc, date_now, date_past)
     response_dict_list = process_responses(responses) # Returns a blank list, [], if the site has no data w/in date range
-    if response_dict_list != []:
+    if response_dict_list != []: # if the response_dict_list is not empty
         keys, loc_dfs = merge_dfs(response_dict_list)
-        print(loc_dfs)
-        for df in loc_dfs.values():
+        #print(loc_dfs)
+        for df in loc_dfs.values(): # Converts each df to csv based on unique path link
             df.to_csv(f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}\\{df.iloc[0,2]}.csv")
-            #df.to_csv(r"C:\Users\GIS\MichaelHudak projects\HydroVu_Location_Params\Mary Bee Gaines Dock AquaTroll")
     else:
         print(f"No data in timeframe for {loc}")
         
 
 # In[]:
     
+# Updates an existing set of csvs for a location that already has csvs
 def update_csv(loc):
+    # Establishes a unique folder_path for the location folder
     folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}"
-    all_files = glob.glob(os.path.join(folder_path, "*.csv"))
+    # grab all files in that folder that end with .csv
+    all_files = glob.glob(os.path.join(folder_path, "*.csv")) 
     final_date_list = []
     for filename in all_files:
         df = pd.read_csv(filename, header=0)
         last_date = df.iloc[-1, 1]
-        final_date_list.append(last_date)
-        #print(last_date)
+        final_date_list.append(last_date) # List of most recent dates for each parameter
         
-    most_recent_date = max(final_date_list)
+    most_recent_date = max(final_date_list) # The most recent data across all parameters
     responses = loop_by_date(loc, datetime.now().timestamp(), most_recent_date) 
     response_dict_list = process_responses(responses)
     keys, loc_dfs = merge_dfs(response_dict_list)
     
+    # Appends (mode='a') new data to the existing csv
     for df in loc_dfs.values():
         df.to_csv(f"{folder_path}\\{df.iloc[0,2]}.csv", mode='a', index=True, header=False)
         
@@ -290,15 +304,23 @@ def update_csv(loc):
 
 
 # In[26]:
-
+"""
+Takes a location name as input and creates a folder_path link for that location.
+Uses a try/except pairing so that the code doesn't crash if a location folder does not exist yet.
+Grabs all the .csv files from the folder path, coverts each one to a dataframe, and returns 
+a list of all the dataframes.
+"""
 def dfs_from_csvs(loc):
+    # Creates a path to the location folder, which is flexible to the location input
     folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}"
-    try:
-        all_files = glob.glob(os.path.join(folder_path, "*.csv"))
+    
+    # If this function is run for a location without a folder, the function will jump to the except statement
+    try: 
+        all_files = glob.glob(os.path.join(folder_path, "*.csv")) # Grabs all .csv files in the folder_path
         df_list = []
         for filename in all_files:
             df = pd.read_csv(filename, header=0)
-            df_list.append(df)
+            df_list.append(df) # Stores all converted dataframes in a list
         return df_list
     except:
         print(f"{loc} csvs do not exist")
@@ -307,17 +329,22 @@ def dfs_from_csvs(loc):
 
 # In[39]:
 
-def make_graph(df, title, unit):
-    plt.scatter(df.timestamp, df.value, color='black', marker='o')
+# def make_graph(df, title, unit):
+#     plt.scatter(df.timestamp, df.value, color='black', marker='o')
     
-    plt.title(f"{title}")
+#     plt.title(f"{title}")
 
-    plt.ylabel(unit)
+#     plt.ylabel(unit)
     
-    plt.show()
+#     plt.show()
 
 
 # In[40]:
+
+"""
+plotly_graph is not called in the typical script run, HOWEVER
+if you want to experiment with graph appearance, use this for convenience
+"""    
 
 def plotly_graph(df, loc, param, unit):
     fig = px.scatter(x=df['timestamp'], y=df["value"],
@@ -339,11 +366,15 @@ def plotly_graph(df, loc, param, unit):
 # In[48]:
 
 
-#1. Ensure access token is updated and active
-access_token = update_access_token()
+#Ensure access token is updated and active
+#access_token = update_access_token()
 
 
-# In[85]:
+# In[63]:
+
+# Path Parameter constants
+OWNER = "WC-CES-Watershed-Innovation-Lab"
+REPO  = "WaterQualityData"
 
 
 # The local_git_token may need manual updates in GitHub
@@ -352,14 +383,6 @@ git_headers = {
     "Accept": "application/vnd.github+json",
     "User-Agent": "data_update"
 }
-
-
-# In[63]:
-
-
-# Path Parameter constants
-OWNER = "WC-CES-Watershed-Innovation-Lab"
-REPO  = "WaterQualityData"
 
 
 # In[65]:
@@ -371,30 +394,28 @@ def file_exists(url):
     
     meta = requests.get(url, headers=git_headers)
     if meta.status_code == 200:
-        return meta.json()["sha"]
+        return meta.json()["sha"] # sha is important for GitHub access
     else:
         return None
 
 
 # In[67]:
 
-
-# Make the request
-
+# Make the request to GitHub to alter graph files
 def git_api_call(url, content):
     global git_headers
 
-    sha = file_exists(url)
+    sha = file_exists(url) # Checks if file exists before proceeding
     
     git_body_params = {
     "message" : "Updating the plots",
     "content" : content,
     }
 
-    if sha is not None:
+    if sha is not None: 
         git_body_params["sha"] = sha
     
-    
+    # I believe these should be indented, inside the if statement
     response = requests.put(url, headers=git_headers, json=git_body_params)
     response.raise_for_status()
     print(response.json())
@@ -402,7 +423,7 @@ def git_api_call(url, content):
 
 # In[69]:
 
-
+# Converts dates from epoch to normal human-friendly datetime
 def convert_dates(time_array):
     new_dates = []
     for val in time_array:
@@ -467,4 +488,3 @@ print("--- %s seconds ---" % (time.time() - start_time))
 
 
 #print(convert_dates([1770663600]))
-
