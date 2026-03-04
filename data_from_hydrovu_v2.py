@@ -415,10 +415,9 @@ def git_api_call(url, content):
     if sha is not None: 
         git_body_params["sha"] = sha
     
-    # I believe these should be indented, inside the if statement
-    response = requests.put(url, headers=git_headers, json=git_body_params)
-    response.raise_for_status()
-    print(response.json())
+        response = requests.put(url, headers=git_headers, json=git_body_params)
+        response.raise_for_status()
+        print(response.json())
 
 
 # In[69]:
@@ -488,3 +487,4 @@ print("--- %s seconds ---" % (time.time() - start_time))
 
 
 #print(convert_dates([1770663600]))
+
