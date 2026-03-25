@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt # Available for quick plotting
 import requests # Connects with HydroVu and GitHub for data calls and uploads
 from datetime import datetime, timedelta # Converts epoch time from raw data, sets start date when building CSVs
 import plotly.express as px # Interactive graph display that gets sent to GitHub
-#import plotly.io as pio
+import plotly.io as pio
 import os # Enables viewing external files
 import glob # Enables grabbing all files in a folder
 #import sys 
@@ -23,7 +23,7 @@ from io import BytesIO, StringIO # Enables treating a string like a file object 
 
 start_time = time.time()
 #sys.setrecursionlimit(10000) # Increase the limit to 10000
-#pio.renderers.default = 'browser' #determines how plot displays
+pio.renderers.default = 'browser' #determines how plot displays
 
 
 # ## Prologue
@@ -57,6 +57,37 @@ location_ids = {
     
 }
 
+ALL_PARAMS = ["Actual Conductivity", "Specific Conductivity", "Salinity", "Resistivity",
+              "Density", "Total Dissolved Solids", "Chl-a Fluorescence", "Chl-a Concentration",
+              "Turbidity", "Total Suspended Solids", "Temperature", "External Voltage", "Pressure",
+              "Depth", "pH", "pH MV", "ORP", "DO", "% Saturation O₂", "Partial Pressure O₂",
+              "Level Depth to Water", "Level Elevation", "Baro"]
+
+UNITS_BY_PARAM = {
+    "Actual Conductivity" : 'µS/cm', 
+    "Specific Conductivity" : 'µS/cm', 
+    "Salinity" : 'psu', 
+    "Resistivity" : 'Ω-cm',
+    "Density" : 'g/cm³', 
+    "Total Dissolved Solids" : 'mg/L', 
+    "Chl-a Fluorescence" : 'RFU',
+    "Chl-a Concentration" : 'mg/L',
+    "Turbidity" : 'NTU', 
+    "Total Suspended Solids" : 'mg/L', 
+    "Temperature" : 'C', 
+    "External Voltage" : 'V', 
+    "Pressure" : 'psi',
+    "Depth" : 'm', 
+    "pH" : 'pH', 
+    "pH MV" : 'V', 
+    "ORP" : 'V', 
+    "DO" : 'mg/L', 
+    "% Saturation O₂" : '% sat', 
+    "Partial Pressure O₂" : 'psi',
+    "Level Depth to Water" : 'm', 
+    "Level Elevation" : 'm', 
+    "Baro" : 'psi'
+    }
 
 # In[8]:
 
@@ -359,9 +390,32 @@ def plotly_graph(df, loc, param, unit):
     
 
 
-#.write_html into a folder for each location, and upload the folder in relevant GitHub page
 
-# # Main Function Sequence
+# In[]: Experimenting with Plotly graphs
+
+def location_id_to_name(df):
+    id_num = df['locationId'][0]
+    reversed_loc_dict = {value: key for key, value in location_ids.items()}
+    df['locationId'] = df['locationId'].map(lambda x: reversed_loc_dict[x])
+    return df
+
+def all_site_plotly_graph(dfs, param):
+    #big_df = pd.concat([sec_df, morg_df])
+    plot_times = convert_dates(dfs['timestamp'])
+    big_df = location_id_to_name(dfs)
+    unit_label = UNITS_BY_PARAM[param]
+    
+    fig = px.line(big_df, x=plot_times, y='value', color='locationId',
+                     title=f'{param} by Location',
+                     labels={'locationId': "Location",
+                             'x': "Date/Time",
+                             'value': f"{param}, ({unit_label})"})
+    
+    return fig, param
+
+
+
+
 
 # In[48]:
 
@@ -415,9 +469,12 @@ def git_api_call(url, content):
     if sha is not None: 
         git_body_params["sha"] = sha
     
-        response = requests.put(url, headers=git_headers, json=git_body_params)
-        response.raise_for_status()
-        print(response.json())
+    # This should NOT be indented
+    response = requests.put(url, headers=git_headers, json=git_body_params)
+    response.raise_for_status()
+    print(response.json())
+    # else:
+    #     print("sha is none")
 
 
 # In[69]:
@@ -456,8 +513,20 @@ def plotly_bytes(df, loc, param, unit):
 
     git_api_call(url, content_base64)
 
+def all_locs_plotly_bytes(fig, plot_param):
+    
+    buf = StringIO()
+    fig.write_html(buf, include_plotlyjs='cdn')
 
-# # Below print out strings necessary for html page setup
+        
+    html_text = buf.getvalue()
+
+    content_base64 = base64.b64encode(html_text.encode("utf-8")).decode("utf-8")
+
+    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/docs/All%20Locations/{plot_param}.html"
+
+    git_api_call(url, content_base64)
+
 
 
 # In[]:
@@ -472,19 +541,37 @@ Must uncomment for loop codes for full functionality.
 # for loc in location_ids:
 #     build_csv(loc, 500)
 
-for loc in location_ids:
-    update_csv(loc)
+# for loc in location_ids:
+#     update_csv(loc)
 
+# for loc in location_ids:
+#     dfs_to_convert = dfs_from_csvs(loc) # NoneType if no csv exists
+#     if dfs_to_convert:
+#         for df in dfs_to_convert:
+#             param_name = df.iloc[0,3]
+#             unit_name = df.iloc[0,4]
+#             plotly_bytes(df, loc, param_name, unit_name)
+            
+all_loc_dfs = {}    
 for loc in location_ids:
-    dfs_to_convert = dfs_from_csvs(loc) # NoneType if no csv exists
-    if dfs_to_convert:
-        for df in dfs_to_convert:
-            param_name = df.iloc[0,3]
-            unit_name = df.iloc[0,4]
-            plotly_bytes(df, loc, param_name, unit_name)
+    list_name = f"{loc}_df_list"
+    all_loc_dfs[list_name] = dfs_from_csvs(loc) # creates key:value pair with location name key and list of dataframes
+
+# Establish the all-loc dfs per parameter
+all_loc_param_dfs = {}
+for param in ALL_PARAMS: # this is for sure an inefficient sorting algorithm
+    param_df = pd.DataFrame()
+    for loc in all_loc_dfs:
+        df_list = all_loc_dfs[loc]
+        for df in df_list:
+            if df['param_name'][0] == param:
+                param_df = pd.concat([param_df, df])
+    plot_fig, plot_param = all_site_plotly_graph(param_df, param)
+    all_locs_plotly_bytes(plot_fig, plot_param)
+    all_loc_param_dfs[param] = param_df
+
 
 print("--- %s seconds ---" % (time.time() - start_time))
 
 
 #print(convert_dates([1770663600]))
-
