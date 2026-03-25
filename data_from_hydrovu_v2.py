@@ -523,7 +523,7 @@ def all_locs_plotly_bytes(fig, plot_param):
 
     content_base64 = base64.b64encode(html_text.encode("utf-8")).decode("utf-8")
 
-    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/docs/All%20Locations/{plot_param}.html"
+    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/docs/All Locations/{plot_param}.html"
 
     git_api_call(url, content_base64)
 
