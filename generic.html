@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Data Portal</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="index.html" class="logo">Watershed Innovation Lab</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="index.html">About</a></li>
+							<li class="active"><a href="generic.html">Data Portal</a></li>
+							<li><a href="elements.html">Elements Reference</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+							<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<!-- <span class="date">April 25, 2017</span> PUTS TEXT IN THE CENTER OF A HORIZONTAL LINE -->
+									<h1>Welcome to the<br />
+									Data Portal</h1>
+									<p>Select on the drop-down menu the water quality metric<br />
+									you want to view. Click the location legend to toggle which<br />
+									locations you want displayed. Click, hold, and drag the mouse to<br />
+									zoom in a particular time window.</p>
+								</header>
+								
+							<div id='AllLocations' class='tabcontent'>
+						        <h3> Water Quality Data for All Locations</h3>
+						        <label for="allLocationsSelect">Select a parameter:</label>
+						        <select id="allLocationsSelect" onchange="updateGraph('allLocationsFrame', 'allLocationsSelect')">
+						            <option value="">-- Choose a graph --</option>
+						            <option value="All%20Locations/Actual%20Conductivity.html">Actual Conductivity</option>
+						            <option value="All%20Locations/Specific%20Conductivity.html">Specific Conductivity</option>
+						            <option value="All%20Locations/Salinity.html">Salinity</option>
+						            <option value="All%20Locations/Resistivity.html">Resistivity</option>
+						            <option value="All%20Locations/Density.html">Density</option>
+						            <option value="All%20Locations/Total%20Dissolved%20Solids.html">Total Dissolved Solids</option>
+						            <option value="All%20Locations/Chl-a%20Fluorescence.html">Chl-a Fluorescence</option>
+						            <option value="All%20Locations/Chl-a%20Concentration.html">Chl-a Concentration</option>
+						            <option value="All%20Locations/Turbidity.html">Turbidity</option>
+						            <option value="All%20Locations/Total%20Suspended%20Solids.html">Total Suspended Solids</option>
+						            <option value="All%20Locations/Temperature.html">Temperature</option>
+						            <option value="All%20Locations/External%20Voltage.html">External Voltage</option>
+						            <option value="All%20Locations/Pressure.html">Pressure</option>
+						            <option value="All%20Locations/Baro.html">Baro</option>
+						            <option value="All%20Locations/Depth.html">Depth</option>
+						            <option value="All%20Locations/pH.html">pH</option>
+						            <option value="All%20Locations/pH%20MV.html">pH MV</option>
+						            <option value="All%20Locations/ORP.html">ORP</option>
+						            <option value="All%20Locations/%25%20Saturation%20O₂.html">% Saturation O₂</option> 
+						            <option value="All%20Locations/DO.html">DO</option>
+						            <option value="All%20Locations/Partial%20Pressure%20O₂.html">Partial Pressure O₂</option>
+						            <option value="All%20Locations/Level%20Depth%20to%20Water.html">Level Depth to Water</option>
+						            <option value="All%20Locations/Level%20Elevation.html">Level Elevation</option>
+						        </select>
+						    
+						        <iframe id="allLocationsFrame" style="position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0"></iframe>
+						    </div>
+							
+								
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							<form method="post" action="https://formspree.io/f/maqlavng">
+								<h4> Interested in requesting data files? Fill out the contact form:</h4>
+								<div class="fields">
+									<div class="field">
+										<label for="name">Name</label>
+										<input type="text" name="name" id="name" />
+									</div>
+									<div class="field">
+										<label for="email">Email</label>
+										<input type="text" name="email" id="email" />
+									</div>
+									<div class="field">
+										<label for="message">Message</label>
+										<textarea name="message" id="message" rows="3"></textarea>
+									</div>
+								</div>
+								<ul class="actions">
+									<li><input type="submit" value="Send Message" /></li>
+								</ul>
+							</form>
+						</section>
+						<section class="split contact">
+							<section class="alt">
+								<h3>Address</h3>
+								<p>300 Washington Ave<br />
+								Chestertown, MD 21620</p>
+							</section>
+							<section>
+								<h3>Phone</h3>
+								<p><a href="tel:+14108108405">(410) 810-8405</a></p>
+							</section>
+							<section>
+								<h3>Email</h3>
+								<p><a href="mailto:cpeters4@washcoll.edu">cpeters4@washcoll.edu</a></p>
+							</section>
+							<section>
+								<h3>Social</h3>
+								<ul class="icons alt">
+									<li><a href="#" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
+									<li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
+									<li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
+									<li><a href="#" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+								</ul>
+							</section>
+						</section>
+					</footer>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+			<script>
+		        function updateGraph(frameId, selectId) {
+		            const frame = document.getElementById(frameId);
+		            const select = document.getElementById(selectId);
+		            frame.src = select.value;
+		        }
+		        function changeLoc(evt, locName) {
+		            // Declare variables
+		            var i, tabcontent, tablinks;
+		            // Get all elements with class = 'tabcontent' and hide them
+		            tabcontent = document.getElementsByClassName("tabcontent");
+		            for (i = 0; i < tabcontent.length; i++) {
+		                tabcontent[i].style.display = "none";
+		            }
+		            // Get all elements with class= "tablinks" and remove the class "active"
+		            tablinks = document.getElementsByClassName("tablinks");
+		            for (i = 0; i < tablinks.length; i++) {
+		                tablinks[i].className = tablinks[i].className.replace(" active", "");
+		            }
+		            // Show current tab and add an "active" class to the button that opened the tab
+		            document.getElementById(locName).style.display = "block";
+		            evt.currentTarget.className += " active";
+		        }
+		    </script>
+
+	</body>
+</html>
