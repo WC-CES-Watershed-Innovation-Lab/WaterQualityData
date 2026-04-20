@@ -32,7 +32,7 @@ pio.renderers.default = 'browser' #determines how plot displays
 
 
 # These must be defined before running the code
-LOCAL_CLIENT_ID = "" # found in HydroVu website
+LOCAL_CLIENT_ID = "mhudak_" # found in HydroVu website
 LOCAL_CLIENT_SECRET = "" # found in HydroVu website
 # git token must be generated in GitHub
 LOCAL_GIT_TOKEN = ""
@@ -513,6 +513,7 @@ def plotly_bytes(df, loc, param, unit):
 
     git_api_call(url, content_base64)
 
+# Similar to plotly_bytes above but does not require specified loc or unit
 def all_locs_plotly_bytes(fig, plot_param):
     
     buf = StringIO()
@@ -523,7 +524,7 @@ def all_locs_plotly_bytes(fig, plot_param):
 
     content_base64 = base64.b64encode(html_text.encode("utf-8")).decode("utf-8")
 
-    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/docs/All Locations/{plot_param}.html"
+    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/docs/All%20Locations/{plot_param}.html"
 
     git_api_call(url, content_base64)
 
@@ -560,11 +561,14 @@ for loc in location_ids:
 # Establish the all-loc dfs per parameter
 all_loc_param_dfs = {}
 for param in ALL_PARAMS: # this is for sure an inefficient sorting algorithm
-    param_df = pd.DataFrame()
-    for loc in all_loc_dfs:
+    param_df = pd.DataFrame() # creates a dataframe to store data across all locations for the given param
+    for loc in all_loc_dfs: #steps through each location and grabs all of its dataframes
         df_list = all_loc_dfs[loc]
-        for df in df_list:
-            if df['param_name'][0] == param:
+        
+        # This double for-loop is inefficient and logically unnecessary, 
+        # but grabbing values from the dataframe wasn't working how I expected
+        for df in df_list: 
+            if df['param_name'][0] == param: # pulls out param-specific df and concatenates to all-location df for that param
                 param_df = pd.concat([param_df, df])
     plot_fig, plot_param = all_site_plotly_graph(param_df, param)
     all_locs_plotly_bytes(plot_fig, plot_param)
