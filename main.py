@@ -26,13 +26,14 @@ start_time = time.time()
 pio.renderers.default = 'browser' #determines how plot displays
 
 
+
 # ## Prologue
 
 # In[81]:
 
 
 # These must be defined before running the code
-LOCAL_CLIENT_ID = "mhudak_" # found in HydroVu website
+LOCAL_CLIENT_ID = "" # found in HydroVu website (Washington College -> Users -> Manage API Access Credentials)
 LOCAL_CLIENT_SECRET = "" # found in HydroVu website
 # git token must be generated in GitHub
 LOCAL_GIT_TOKEN = ""
@@ -171,8 +172,13 @@ def make_one_call(desired_location, header_parameters):
     # Instead of raising an error, the function returns just a "null" value,
     # which the dependent functions can handle
     if response.ok:
+        print(f"{desired_location} hydrovu call worked")
+        print()
+        print(response.json())
+        print()
         return response
     else:
+        print(f"The hydrovu call for {desired_location} did not work")
         return "null"
     
     #data contains timestamp/value pairs for each parameterId, and each parameter has a unitId
@@ -196,9 +202,10 @@ time frame, consists of all paramaters with each parameter in its own singular d
 """
 
 # Establishes logic to make continuous HydroVu API calls by looping through data date-wise
-# HydroVu only returns about 120 data points with each request, so we need to loop multiple requests
+# HydroVu only returns about 120 data points with each request, so we need to loop multiple 
 def loop_by_date(desired_location, now_date, start_date):
-
+    now_date = int(now_date) # ensures dates are the same type, in this case int because of epoch time
+    start_date = int(start_date)
     response_list = []
     checked_dates = [] # Anti infinite loop control
     while start_date < now_date: # start_date must be some epoch date in the past
@@ -208,6 +215,8 @@ def loop_by_date(desired_location, now_date, start_date):
         }
         r = make_one_call(desired_location, header_parameters)
         if r == "null": # if the make_one_call() does not return any data, stop looping
+            if not response_list:
+                print(f"{desired_location} returned a null value while empty")
             break
         response_list.append(r)
         checked_dates.append(start_date)
@@ -241,6 +250,7 @@ def extract_param_data(loc_data):
         df["locationId"] = loc_id
         
         results[pid] = df
+        
     return results
 
 
@@ -303,7 +313,7 @@ def build_csv(loc, how_many_days_ago): # how many days in the past should we gra
         keys, loc_dfs = merge_dfs(response_dict_list)
         #print(loc_dfs)
         for df in loc_dfs.values(): # Converts each df to csv based on unique path link
-            df.to_csv(f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}\\{df.iloc[0,2]}.csv")
+            df.to_csv(f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}\\{df['param_name'].iloc[0]}.csv", index=False)
     else:
         print(f"No data in timeframe for {loc}")
         
@@ -313,25 +323,65 @@ def build_csv(loc, how_many_days_ago): # how many days in the past should we gra
 # Updates an existing set of csvs for a location that already has csvs
 def update_csv(loc):
     # Establishes a unique folder_path for the location folder
-    folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}"
+    folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\test_data_cleaning\\{loc}"
     # grab all files in that folder that end with .csv
     all_files = glob.glob(os.path.join(folder_path, "*.csv")) 
     final_date_list = []
     for filename in all_files:
         df = pd.read_csv(filename, header=0)
-        last_date = df.iloc[-1, 1]
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]  # drop stray index columns
+        
+        if df.empty:  # skip empty files
+            print(f"Skipping empty file: {filename}")
+            continue
+        
+        last_date = df['timestamp'].iloc[-1]
         final_date_list.append(last_date) # List of most recent dates for each parameter
         
     most_recent_date = max(final_date_list) # The most recent data across all parameters
     responses = loop_by_date(loc, datetime.now().timestamp(), most_recent_date) 
     response_dict_list = process_responses(responses)
     keys, loc_dfs = merge_dfs(response_dict_list)
+    #print(loc, loc_dfs)
     
-    # Appends (mode='a') new data to the existing csv
-    for df in loc_dfs.values():
-        df.to_csv(f"{folder_path}\\{df.iloc[0,2]}.csv", mode='a', index=True, header=False)
-        
+    if bool(loc_dfs) == True:
+        # Appends (mode='a') new data to the existing csv
+        for df in loc_dfs.values():
+            try:
+                df.to_csv(f"{folder_path}\\{df['param_name'].iloc[0]}.csv", mode='a', index=False, header=False)
+            except IndexError:
+                print(f"Code did not work for {loc} at file path {folder_path}")
+    else:
+        print(f"{loc} returned empty dataframes.")
+                
 
+# In[]:
+# Meant to restructure cssvs with proper column headers, if they get messed up through cleaning or updating
+def rebuild_csvs(loc):
+    folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\test_data_cleaning\\{loc}"
+    all_files = glob.glob(os.path.join(folder_path, "*.csv"))
+    expected_columns = ['timestamp', 'value', 'param_name', 'unit_name', 'locationId']
+    
+    for filename in all_files:
+        df = pd.read_csv(filename, header=0)
+        
+        # Drop any unnamed columns (stray index columns)
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+        
+        # Remove any duplicate header rows
+        df = df[df['timestamp'] != 'timestamp']
+        
+        # Check that expected columns exist after cleanup
+        if not all(col in df.columns for col in expected_columns):
+            print(f"Could not recover: {filename} — columns found: {df.columns.tolist()}")
+            continue
+        
+        # Keep only the expected columns in the right order
+        df = df[expected_columns]
+        
+        df.drop_duplicates(inplace=True)
+        df.to_csv(filename, index=False)
+        print(f"Rebuilt: {filename} ({len(df)} rows)")
 
 
 # In[26]:
@@ -343,7 +393,8 @@ a list of all the dataframes.
 """
 def dfs_from_csvs(loc):
     # Creates a path to the location folder, which is flexible to the location input
-    folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\HydroVu_Location_Params\\{loc}"
+    folder_path = f"C:\\Users\\GIS\\MichaelHudak projects\\test_data_cleaning\\{loc}"
+    expected_columns = {'timestamp', 'value', 'param_name', 'unit_name', 'locationId'}
     
     # If this function is run for a location without a folder, the function will jump to the except statement
     try: 
@@ -351,9 +402,19 @@ def dfs_from_csvs(loc):
         df_list = []
         for filename in all_files:
             df = pd.read_csv(filename, header=0)
-            df_list.append(df) # Stores all converted dataframes in a list
+            df = df.loc[:, ~df.columns.str.contains('^Unnamed')]  # drop stray index columns
+            
+            df = df[df['timestamp'] != 'timestamp']  # strip duplicate header rows
+            
+            if not expected_columns.issubset(df.columns):  # skip if columns are wrong
+                print(f"Skipping malformed file (unexpected columns): {filename}")
+                print(f"  Found: {df.columns.tolist()}")
+                continue
+            
+            if not df.empty:
+                df_list.append(df) # stores all converted dfs in a list
         return df_list
-    except:
+    except: 
         print(f"{loc} csvs do not exist")
 
 # ## 4. Make the plots (pyplot & plotly)
@@ -394,7 +455,6 @@ def plotly_graph(df, loc, param, unit):
 # In[]: Experimenting with Plotly graphs
 
 def location_id_to_name(df):
-    id_num = df['locationId'][0]
     reversed_loc_dict = {value: key for key, value in location_ids.items()}
     df['locationId'] = df['locationId'].map(lambda x: reversed_loc_dict[x])
     return df
@@ -507,7 +567,7 @@ def plotly_bytes(df, loc, param, unit):
         
     html_text = buf.getvalue()
 
-    content_base64 = base64.b64encode(html_text.encode("utf-8")).decode("utf-8")
+    content_base64 = base64.b64encode(html_text.encode("utf-8")).decode("utf-8") 
 
     url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/docs/{loc}/{param}.html"
 
@@ -524,7 +584,7 @@ def all_locs_plotly_bytes(fig, plot_param):
 
     content_base64 = base64.b64encode(html_text.encode("utf-8")).decode("utf-8")
 
-    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/docs/All%20Locations/{plot_param}.html"
+    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/All Locations/{plot_param}.html"
 
     git_api_call(url, content_base64)
 
@@ -534,25 +594,33 @@ def all_locs_plotly_bytes(fig, plot_param):
 
 """
 Must uncomment for loop codes for full functionality.
- - change the number in the buil_csv loop decide how many days in the past to start the csv
+ - change the number in the build_csv loop decide how many days in the past to start the csv
  - only run build_csv for a new location, or if an old location's csv gets deleted
+ - run rebuild_csvs if the column headers get misformatted
  - the update_csv loop must be run before the plotly_bytes loop can have any effect
 """    
 
-# for loc in location_ids:
-#     build_csv(loc, 500)
+# new_location = ""
+# build_csv(new_location, 500)
 
 # for loc in location_ids:
-#     update_csv(loc)
+#     rebuild_csvs(loc)
 
+
+## ADDS RECENT DATA TO THE CSV FILES
+for loc in location_ids:
+    update_csv(loc)
+
+### THIS updates the docs folder in GitHub, which can be used if we want plots for each location
 # for loc in location_ids:
 #     dfs_to_convert = dfs_from_csvs(loc) # NoneType if no csv exists
 #     if dfs_to_convert:
 #         for df in dfs_to_convert:
-#             param_name = df.iloc[0,3]
-#             unit_name = df.iloc[0,4]
+#             param_name = df['param_name'].iloc[0]
+#             unit_name = df['unit_name'].iloc[0]
 #             plotly_bytes(df, loc, param_name, unit_name)
-            
+
+### RUN ALL BELOW CODE TO UPDATE GRAPHS ON GITHUB            
 all_loc_dfs = {}    
 for loc in location_ids:
     list_name = f"{loc}_df_list"
@@ -565,10 +633,9 @@ for param in ALL_PARAMS: # this is for sure an inefficient sorting algorithm
     for loc in all_loc_dfs: #steps through each location and grabs all of its dataframes
         df_list = all_loc_dfs[loc]
         
-        # This double for-loop is inefficient and logically unnecessary, 
-        # but grabbing values from the dataframe wasn't working how I expected
+        # This double for-loop is inefficient, but I tried a different way that didn't work
         for df in df_list: 
-            if df['param_name'][0] == param: # pulls out param-specific df and concatenates to all-location df for that param
+            if not df.empty and df['param_name'].iloc[0] == param: # pulls out param-specific df and concatenates to all-location df for that param
                 param_df = pd.concat([param_df, df])
     plot_fig, plot_param = all_site_plotly_graph(param_df, param)
     all_locs_plotly_bytes(plot_fig, plot_param)
