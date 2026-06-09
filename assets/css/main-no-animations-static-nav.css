@@ -4874,19 +4874,19 @@ body.is-preload #intro img {
 /* -------------------------------------------------------------------------- */
 
 #main {
-	margin-top: 1 !important;
+	margin-top: 2rem !important;
 }
 
 #main > * {
-	padding-top: 1rem !important;
+	padding-top: 2rem !important;
 }
 
 #main > .post {
-	padding-top: 1rem !important;
+	padding-top: 2rem !important;
 }
 
 #main > .posts > * {
-	padding-top: 1rem !important;
+	padding-top: 2rem !important;
 }
 
 #main > *:first-child,
