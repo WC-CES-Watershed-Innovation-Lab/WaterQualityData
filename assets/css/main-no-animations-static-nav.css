@@ -4899,7 +4899,7 @@ body.is-preload #intro img {
 	#main > *,
 	#main > .post,
 	#main > .posts > * {
-		padding-top: 0.75rem !important;
+		padding-top: 2rem !important;
 	}
 }
 
