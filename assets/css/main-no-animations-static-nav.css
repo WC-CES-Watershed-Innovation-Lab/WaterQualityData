@@ -4874,7 +4874,7 @@ body.is-preload #intro img {
 /* -------------------------------------------------------------------------- */
 
 #main {
-	margin-top: 0 !important;
+	margin-top: 1 !important;
 }
 
 #main > * {
