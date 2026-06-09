@@ -4892,7 +4892,7 @@ body.is-preload #intro img {
 #main > *:first-child,
 #main > .post:first-child,
 #main > .posts:first-child {
-	padding-top: 0 !important;
+	padding-top: 2rem !important;
 }
 
 @media screen and (max-width: 736px) {
