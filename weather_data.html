@@ -39,41 +39,26 @@
 								<header class="major">
 									<!-- <span class="date">April 25, 2017</span> PUTS TEXT IN THE CENTER OF A HORIZONTAL LINE -->
 									<h1>Weather Data</h1>
-									<p>Select on the drop-down menu the water quality metric you want to view. Click the location legend to toggle <br />
+									<p>Using the drop-down menu, select the weather parameter you want to view. Click the location legend to toggle <br />
 									which locations you want displayed. Click, hold, and drag the mouse to zoom in a particular time window.</p>
 								</header>
 								
-							<div id='AllLocations' class='tabcontent'>
-						        <h3> Water Quality Data for All Locations</h3>
-						        <label for="allLocationsSelect">Select a parameter:</label>
-						        <select id="allLocationsSelect" onchange="updateGraph('allLocationsFrame', 'allLocationsSelect')">
+							<div id='Weather' class='tabcontent'>
+						        <h3> Weather Data for All Locations</h3>
+						        <label for="WeatherSelect">Select a parameter:</label>
+						        <select id="WeatherSelect" onchange="updateGraph('WeatherFrame', 'WeatherSelect')">
 						            <option value="">-- Choose a graph --</option>
-						            <option value="All%20Locations/Actual%20Conductivity.html">Actual Conductivity</option>
-						            <option value="All%20Locations/Specific%20Conductivity.html">Specific Conductivity</option>
-						            <option value="All%20Locations/Salinity.html">Salinity</option>
-						            <option value="All%20Locations/Resistivity.html">Resistivity</option>
-						            <option value="All%20Locations/Density.html">Density</option>
-						            <option value="All%20Locations/Total%20Dissolved%20Solids.html">Total Dissolved Solids</option>
-						            <option value="All%20Locations/Chl-a%20Fluorescence.html">Chl-a Fluorescence</option>
-						            <option value="All%20Locations/Chl-a%20Concentration.html">Chl-a Concentration</option>
-						            <option value="All%20Locations/Turbidity.html">Turbidity</option>
-						            <option value="All%20Locations/Total%20Suspended%20Solids.html">Total Suspended Solids</option>
-						            <option value="All%20Locations/Temperature.html">Temperature</option>
-						            <option value="All%20Locations/External%20Voltage.html">External Voltage</option>
-						            <option value="All%20Locations/Pressure.html">Pressure</option>
-						            <option value="All%20Locations/Baro.html">Baro</option>
-						            <option value="All%20Locations/Depth.html">Depth</option>
-						            <option value="All%20Locations/pH.html">pH</option>
-						            <option value="All%20Locations/pH%20MV.html">pH MV</option>
-						            <option value="All%20Locations/ORP.html">ORP</option>
-						            <option value="All%20Locations/%25%20Saturation%20O₂.html">% Saturation O₂</option> 
-						            <option value="All%20Locations/DO.html">DO</option>
-						            <option value="All%20Locations/Partial%20Pressure%20O₂.html">Partial Pressure O₂</option>
-						            <option value="All%20Locations/Level%20Depth%20to%20Water.html">Level Depth to Water</option>
-						            <option value="All%20Locations/Level%20Elevation.html">Level Elevation</option>
+						            <option value="weather_plots/airtemp_c.html">Air Temperature</option>
+						            <option value="weather_plots/dewpoint_c.html">Dew Point</option>
+									<option value="weather_plots/windchill_c.html">Wind Chill</option>
+						            <option value="weather_plots/precipintensity_mmph.html">Precipitation Intensity</option>
+						            <option value="weather_plots/relairpressure_hpa.html">Relative Air Pressure</option>
+						            <option value="weather_plots/rh_pct.html">Relative Humidity</option>
+						            <option value="weather_plots/windspeed_mps.html">Wind Speed</option>
+						            <option value="weather_plots/winddir_degree.html">Wind Direction</option>
 						        </select>
 						    
-						        <iframe id="allLocationsFrame" style="position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0"></iframe>
+						        <iframe id="WeatherFrame" style="position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0"></iframe>
 						    </div>
 							
 								
