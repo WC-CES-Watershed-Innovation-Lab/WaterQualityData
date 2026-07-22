@@ -177,7 +177,7 @@ input, select, textarea {
 
 	p {
 		text-align: justify;
-		margin: 0 0 2rem 0;
+		margin: 0 0 0.001rem 0;
 	}
 
 	h1, h2, h3, h4, h5, h6 {
@@ -208,7 +208,7 @@ input, select, textarea {
 	}
 
 	h3 {
-		font-size: 1.25rem;
+		font-size: 1.5rem;
 		margin: 0 0 1.5rem 0;
 	}
 
@@ -2919,9 +2919,9 @@ input, select, textarea {
 			position: relative;
 		}
 
-		header > p {
+		/* header > p {
 			font-style: italic;
-		}
+		} */
 
 		header > h1 + p {
 			font-size: 1.1rem;
@@ -2945,7 +2945,7 @@ input, select, textarea {
 		}
 
 		header.major {
-			margin: 0 0 4rem 0;
+			margin: 0 0 0.5rem 0;
 			text-align: center;
 		}
 
@@ -2954,7 +2954,7 @@ input, select, textarea {
 			}
 
 			header.major > p {
-				margin-top: 4rem;
+				margin-top: 2rem;
 				text-align: center;
 			}
 
