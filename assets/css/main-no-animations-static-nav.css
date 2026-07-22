@@ -3712,7 +3712,7 @@ input, select, textarea {
 					-ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 					transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 					display: block;
-					font-size: 1rem;
+					font-size: 1.1rem;
 					outline: none;
 					padding: 0 2rem;
 				}
@@ -4600,8 +4600,7 @@ input, select, textarea {
 					border-bottom: 0;
 					display: block;
 					font-family: "Source Sans Pro", Helvetica, sans-serif;
-					font-size: 0.9rem;
-					font-size: 0.9rem;
+					font-size: 1.1rem;
 					font-weight: 900;
 					letter-spacing: 0.075em;
 					padding: 0.75rem 0;
