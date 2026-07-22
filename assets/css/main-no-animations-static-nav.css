@@ -2919,9 +2919,9 @@ input, select, textarea {
 			position: relative;
 		}
 
-		/* header > p {
-			font-style: italic;
-		} */
+		header > p {
+			font-size: 1rem;
+		}
 
 		header > h1 + p {
 			font-size: 1.1rem;
