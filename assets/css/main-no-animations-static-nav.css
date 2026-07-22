@@ -2909,6 +2909,7 @@ input, select, textarea {
 
 	header {
 		cursor: default;
+		font-size: 1.2rem;
 	}
 
 		header > .date {
@@ -2920,7 +2921,7 @@ input, select, textarea {
 		}
 
 		header > p {
-			font-size: 1rem;
+			font-size: 1.2rem;
 		}
 
 		header > h1 + p {
@@ -2929,7 +2930,7 @@ input, select, textarea {
 			line-height: 2;
 		}
 
-		header > h2 + p {
+		header > h2 ~ p {
 			font-size: 1rem;
 			margin-top: -0.75rem;
 		}
@@ -3711,7 +3712,7 @@ input, select, textarea {
 					-ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 					transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 					display: block;
-					font-size: 0.8rem;
+					font-size: 1rem;
 					outline: none;
 					padding: 0 2rem;
 				}
@@ -3822,7 +3823,7 @@ input, select, textarea {
 					#main > .post header.major > h1, #main > .post header.major h2 {
 						font-size: 2.5rem;
 						line-height: 1.2;
-						margin: 0 0 1.5rem 0;
+						margin: 0 0 1rem 0;
 					}
 					/* #main > .post header.major > h1, #main > .post header.major h2 {
 						font-size: 2.5rem;
@@ -4801,7 +4802,7 @@ a.image:hover img {
 
 /* Keep the site header visible at the top of the viewport while scrolling. */
 #header {
-	position: sticky !important;
+	/* position: sticky !important; */
 	top: 0 !important;
 	z-index: 10000 !important;
 	background-color: #006272 !important;
@@ -4872,11 +4873,11 @@ body.is-preload #intro img {
 }
 
 /* Keep the intro image/logo pinned near the top instead of fading away. */
-#intro img {
+/* #intro img {
 	position: sticky !important;
 	top: 0.75rem !important;
 	z-index: 10001 !important;
-}
+} */
 
 /* -------------------------------------------------------------------------- */
 /* Remove extra padding above the main section                                 */
