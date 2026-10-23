@@ -10,6 +10,9 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main-no-animations-static-nav.css" />
+		<script type="text/javascript" src="jquery.js"></script>
+		<script type = "text/javascript" src = "jquery.csv.js"></script>
+		<script type = "text/javascript" src = "download_data.js"></script>
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -45,11 +48,41 @@
 									<p>Using the drop-down menu below, select the weather parameter you want to view. Click the location legend to toggle
 									which locations you want displayed. Click and drag the mouse to zoom in on a particular time window.</p>
 									<p></p>
+
 								</header>
 								
+							<!-- Would this section look better centered? -->
 							<div id='Weather' class='tabcontent'>
 						        <h3> Weather Data for All Locations</h3>
-						        <label for="WeatherSelect">Select a parameter:</label>
+								<p> Select start and end dates for data you want to view or download. Leave inputs blank to select earliest and latest available dates. </p>
+								
+								<p id = "availabledates"></p>
+
+								<div style = "display: flex; gap: 2rem; align-items: last baseline; justify-content: left;">
+									<!-- Here, add time period select-->
+									<div>
+										<label for ="startdate">Start Date:</label>
+										<input type = "date" id = "startdate">
+									</div>
+									<div>
+										<label for ="enddate">End Date:</label>
+										<input type = "date" id = "enddate">
+									</div>
+									<!-- <div>
+										<label for = "site">Select sites:</label>
+										<select id = "site" multiple>
+											<option value ="">- Select a site -</option>
+											<option value = "test">test</option>
+											<option value = "test2">test2</option>
+										</select>
+									</div> -->
+
+									<!-- Trying JS to download data-->
+									 <button class = "button primary" type = "button" id = "download-btn" onclick = "download_data('data/test.csv')">Download data for selected period</button>
+								</div>
+									<p></p><br>
+
+						        <label for="WeatherSelect">Select a parameter to graph:</label>
 						        <select id="WeatherSelect" onchange="updateGraph('WeatherFrame', 'WeatherSelect')">
 						            <option value="">-- Choose a graph --</option>
 						            <option value="weather_plots/airtemp_c.html">Air Temperature</option>
@@ -65,6 +98,11 @@
 						        <iframe id="WeatherFrame" style="position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0"></iframe>
 						    </div>
 							
+							<div id ="weathermap" class ="tabcontent">
+								<h3> Available locations</h3>
+								<iframe id = "weathermapframe" style = "position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0" 
+								src = "wil_weather_map.html"></iframe>
+							</div>
 								
 							</section>
 

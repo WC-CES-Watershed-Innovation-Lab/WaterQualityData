@@ -10,7 +10,15 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main-no-animations-static-nav.css" />
+		<script src="https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"></script>
+		<script type="text/javascript" src="jquery.js"></script>
+		<script type = "text/javascript" src = "jquery.csv.js"></script>
+
+		<!-- <script type = "text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.40/jquery.csv.min.js"></script> -->
+
+		<script type = "text/javascript" src = "download_data.js"></script>
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
 	</head>
 	<body class="is-preload">
 
@@ -51,6 +59,35 @@
 								
 							<div id='waterquality' class='tabcontent'>
 						        <h3> Water Quality Data for All Locations</h3>
+
+								<p> Below, select the start and end dates for data you want to view or download.</p>
+								<p></p>
+
+								<div style = "display: flex; gap: 2rem; align-items: last baseline; justify-content: left;">
+									<!-- Here, add time period select-->
+									<div>
+										<label for ="startdate">Start Date:</label>
+										<input type = "date" id = "startdate">
+									</div>
+									<div>
+										<label for ="enddate">End Date:</label>
+										<input type = "date" id = "enddate">
+									</div>
+									<!-- <div>
+										<label for = "site">Select sites:</label>
+										<select id = "site" multiple>
+											<option value ="">- Select a site -</option>
+											<option value = "test">test</option>
+											<option value = "test2">test2</option>
+										</select>
+									</div> -->
+
+									<!-- Trying JS to download data-->
+									 <button class = "button primary" type = "button" id = "download-btn" onclick = "download_data('data/test.csv')">Download data for selected period</button>
+								</div>
+									<p></p><br>
+									
+								<!-- add java script to filter viewable data-->
 						        <label for="waterqualitySelect">Select a parameter:</label>
 						        <select id="waterqualitySelect" onchange="updateGraph('waterqualityFrame', 'waterqualitySelect')">
 						            <option value="">-- Choose a graph --</option>
@@ -81,7 +118,12 @@
 						    
 						        <iframe id="waterqualityFrame" style="position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0"></iframe>
 						    </div>
-							
+
+							<div id ="wqmap" class ="tabcontent">
+								<h3> Available locations</h3>
+								<iframe id = "wqmapframe" style = "position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0" 
+								src = "wil_wq_map.html"></iframe>
+							</div>
 								
 							</section>
 
@@ -90,7 +132,7 @@
 				<!-- Footer -->
 					<footer id="footer">
 						<section>
-							<form method="post" action="https://formspree.io/f/maqlavng">
+							<form action="https://formspree.io/f/mrenalrw" method="POST">
 								<h4> Interested in requesting data files? Fill out the contact form:</h4>
 								<div class="fields">
 									<div class="field">
