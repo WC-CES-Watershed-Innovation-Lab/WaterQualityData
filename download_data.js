@@ -7,12 +7,16 @@ var csvparse = $.csv;
 // https://stackoverflow.com/questions/14220321/how-do-i-return-the-response-from-an-asynchronous-call
 // Send start and end available dates to the HTML side
 // There is a bit of an issue here with the different locations, which all have different start/end dates......
+// Oh well?
+
 const htmlFilename = window.location.pathname;
 
 if(htmlFilename.includes("weather")){
-// use this or that filename. datafile = ;
+// use this or that filename. let datafile = ;
+// let datatype = "weather";
 } else if(htmlFilename.includes("water")){
-// use this or that filename. datafile = ;
+// use this or that filename. let datafile = ;
+// let datatype = "water_quality";
 }
 
 // but for now...
@@ -54,7 +58,7 @@ function download_data(datafile) {
     // Get start and end date from HTML input
     let startDate = document.getElementById("startdate").value;
     let endDate = document.getElementById("enddate").value;
-
+    
     // Change end Date to end of that day rather than start (00:00:00)
     // Set to date class in JS
     // For some reason, adding timestamp to the date keeps it in EST internally
@@ -68,15 +72,20 @@ function download_data(datafile) {
         endDate = new Date(endDate);
     }
 
+    // User cannot select future dates
+    let today = new Date();
+    today = today.toLocaleDateString() + " 23:59:59";
+    today = new Date(today);
+
+    console.log(today);
     console.log(startDate);
     console.log(endDate);
 
-    // User cannot select future dates
-    let today = Date.now();
-
     if(startDate > today || endDate > today){
-        alert("You cannot select future dates!");
+        alert("You cannot select future dates.");
+        throw new Error("future date selected");
     }
+
 
     // Now read in data
     $.get(datafile, function(csvdata){
@@ -115,7 +124,8 @@ function download_data(datafile) {
 
         // Address case where user selects end date that comes before start date
         if(startDate > endDate) {
-            alert("Please make sure the start date comes before the end date!");
+            alert("Please make sure the start date comes before the end date.");
+            throw new Error("invalid date range");
         }
 
         // Select dates where timestamp_utc is greater than or equal to startDate and less than or equal to endDate
@@ -128,13 +138,21 @@ function download_data(datafile) {
             data[i].push(withinrange);
         }
 
+        // get number of columns
+        const numcols = data[1].length;
+
         // Print last row of data
-        console.log(data.map(row => row[13]));
+        console.log(data.map(row => row[numcols - 1]));
         // Show length of first row
         console.log(data[1].length);
 
         // Create filtered data where "within range" is true
-        let filteredData = data.filter(row => row[13] == true);
+        let filteredData = data.filter(row => row[numcols - 1] == true);
+
+        if(filteredData.length == 0) {
+            alert("No data available for the selected time frame.");
+            throw new Error("no data available");
+        }
 
         // add headers back on array
         headers = data[0];
@@ -160,6 +178,7 @@ function download_data(datafile) {
         // create filename for download
         const firstdate = filteredData[1][1].replaceAll(":", "").replaceAll(" ", "_");
         const lastdate = filteredData[filteredrows-1][1].replaceAll(":", "").replaceAll(" ", "_");
+        // ADD FEATURE if file contains XXX add water quality to filename, otherwise add weather to filename
         const filename = "waterquality_data_" + firstdate + "_" + lastdate + ".csv";
 
         // console.log(filename);
@@ -174,9 +193,6 @@ function download_data(datafile) {
         a.click();
         a.remove();
 
-        // ADD FEATURE Write alert for if data does not exist for that time frame
-
-        // ADD FEATURE if file contains XXX add water quality to filename, otherwise add weather to filename
     })
 }
 
