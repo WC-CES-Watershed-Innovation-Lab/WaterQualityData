@@ -189,6 +189,12 @@ input, select, textarea {
 		margin: 0 0 1rem 0;
 	}
 
+
+	figcaption{
+		font-size: 90%;
+		font-style: italic;
+	}
+
 		h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 			border-bottom: 0;
 			color: inherit;
@@ -209,7 +215,7 @@ input, select, textarea {
 
 	h3 {
 		font-size: 1.5rem;
-		margin: 0 0 1.5rem 0;
+		margin: 0 0 0.5rem 0;
 	}
 
 	h4 {
@@ -2317,7 +2323,7 @@ input, select, textarea {
 		font-weight: 900;
 		line-height: 1.5;
 		letter-spacing: 0.075em;
-		font-size: 0.8rem;
+		font-size: 1rem;
 		text-transform: uppercase;
 		margin: 0 0 0.75rem 0;
 	}
@@ -2937,7 +2943,7 @@ input, select, textarea {
 
 		header > h3 + p {
 			font-size: 0.9rem;
-			margin-top: -0.75rem;
+			/* margin-top: -0.75rem; */
 		}
 
 		header > h4 + p {
