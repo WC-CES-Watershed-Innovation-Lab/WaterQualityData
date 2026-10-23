@@ -10,12 +10,11 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main-no-animations-static-nav.css" />
-		<script src="https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"></script>
+		<!-- <script src="https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"></script> -->
 		<script type="text/javascript" src="jquery.js"></script>
 		<script type = "text/javascript" src = "jquery.csv.js"></script>
 
 		<!-- <script type = "text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.40/jquery.csv.min.js"></script> -->
-
 		<script type = "text/javascript" src = "download_data.js"></script>
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
@@ -60,8 +59,9 @@
 							<div id='waterquality' class='tabcontent'>
 						        <h3> Water Quality Data for All Locations</h3>
 
-								<p> Below, select the start and end dates for data you want to view or download.</p>
-								<p></p>
+								<p> Select start and end dates for data you want to view or download. Leave inputs blank to select earliest and latest available dates. </p>
+								
+								<p id = "availabledates"></p>
 
 								<div style = "display: flex; gap: 2rem; align-items: last baseline; justify-content: left;">
 									<!-- Here, add time period select-->
@@ -156,16 +156,19 @@
 						<section class="split contact">
 							<section class="alt">
 								<h3>Address</h3>
-								<p>485 S Cross St<br />
+								<p>Washington College<br />
+								Center for Environment & Society<br />
+								485 S Cross St<br />
 								Chestertown, MD 21620</p>
 							</section>
-							<!--<section>
+							<!-- <section>
 								<h3>Phone</h3>
 								<p><a href="tel:+14108108405">(410) 810-8405</a></p>
 							</section> -->
-							<section>
+							<section class ="alt">
 								<h3>Email</h3>
-								<p><a href="mailto:cpeters4@washcoll.edu">cpeters4@washcoll.edu</a></p>
+								<p>Dr. Chelsea Peters<br />
+								<a href="mailto:cpeters4@washcoll.edu">cpeters4@washcoll.edu</a></p>
 							</section>
 							<!--<section>
 								<h3>Social</h3>

@@ -43,7 +43,7 @@ let datafile = "data/test.csv"
         availablestart = data[1][1].substring(0,10);
         availableend = data[rows-1][1].substring(0,10);
 
-        available_string = "Available dates: " + availablestart + " to " + availableend;
+        available_string = "Data available from: " + availablestart + " to " + availableend;
 
         document.getElementById("availabledates").innerHTML = available_string;
     })
