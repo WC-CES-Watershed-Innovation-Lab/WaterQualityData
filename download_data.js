@@ -20,7 +20,7 @@ if(htmlFilename.includes("weather")){
 }
 
 // but for now...
-let datafile = "data/test.csv"
+let datafile = "data/test_weather.csv"
 
     // Now read in data
     $.get(datafile, function(csvdata){
@@ -32,7 +32,7 @@ let datafile = "data/test.csv"
         const cols = data[0].length;
 
         // Original array length
-        console.log(data[0].length);
+        // console.log(data[0].length);
 
         // View timestamp_utc first
         // console.log(data.map(row => row[0]));
@@ -74,12 +74,12 @@ function download_data(datafile) {
 
     // User cannot select future dates
     let today = new Date();
-    today = today.toLocaleDateString() + " 23:59:59";
+    today = today.toISOString().split('T')[0] +  " 23:59:59";
     today = new Date(today);
 
     console.log(today);
-    console.log(startDate);
-    console.log(endDate);
+    console.log(startDate.toISOString());
+    console.log(endDate.toISOString());
 
     if(startDate > today || endDate > today){
         alert("You cannot select future dates.");
@@ -141,7 +141,7 @@ function download_data(datafile) {
         // get number of columns
         const numcols = data[1].length;
 
-        // Print last row of data
+        // Print last column of data
         console.log(data.map(row => row[numcols - 1]));
         // Show length of first row
         console.log(data[1].length);

@@ -9,10 +9,7 @@
 		<title>Weather Station</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main-no-animations-static-nav.css" />
-		<script type="text/javascript" src="jquery.js"></script>
-		<script type = "text/javascript" src = "jquery.csv.js"></script>
-		<script type = "text/javascript" src = "download_data.js"></script>
+		<link rel="stylesheet" href="assets/css/main-no-animations-static-nav.css" />	
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -51,9 +48,9 @@
 
 								</header>
 								
-							<!-- Would this section look better centered? -->
-							<div id='Weather' class='tabcontent'>
+							<div id='weather' class='tabcontent'>
 						        <h3> View and download data</h3>
+
 								<p> Select start and end dates for data you want to view or download. Leave inputs blank to select earliest and latest available dates.</p>
 								<p>NOTE: Input dates are based on your local time zone (adjusted for daylight savings time), but downloaded data are formatted with time in UTC as well as eastern standard time. </p>
 								
@@ -79,29 +76,33 @@
 									</div> -->
 
 									<!-- Trying JS to download data-->
-									 <button class = "button primary" type = "button" id = "download-btn" onclick = "download_data('data/test.csv')">Download data for selected period</button>
+									 <button class = "button primary" type = "button" id = "download-btn" onclick = "download_data('data/test_weather.csv')">Download data for selected period</button>
 								</div>
 									<p></p><br>
 
 						        <label for="WeatherSelect">Select a parameter to graph:</label>
-						        <select id="WeatherSelect" onchange="updateGraph('WeatherFrame', 'WeatherSelect')">
+						        <select id="WeatherSelect" onchange= "create_graph('data/test_weather.csv')">
+								<!-- onchange = "updateGraph('WeatherFrame', 'WeatherSelect')"> -->
 						            <option value="">-- Choose a graph --</option>
-						            <option value="weather_plots/airtemp_c.html">Air Temperature</option>
-						            <option value="weather_plots/dewpoint_c.html">Dew Point</option>
-									<option value="weather_plots/windchill_c.html">Wind Chill</option>
-						            <option value="weather_plots/precipintensity_mmph.html">Precipitation Intensity</option>
-						            <option value="weather_plots/relairpressure_hpa.html">Relative Air Pressure</option>
-						            <option value="weather_plots/rh_pct.html">Relative Humidity</option>
-						            <option value="weather_plots/windspeed_mps.html">Wind Speed</option>
-						            <option value="weather_plots/winddir_degree.html">Wind Direction</option>
+						            <!-- <option value="weather_plots/airtemp_c.html">Air Temperature</option> -->
+									<option value = "airtemp_c">Air Temperature</option>
+									<option value = "dewpoint_c">Dew Point</option>
+									<option value="windchill_c">Wind Chill</option>
+						            <option value="precipintensity_mmph">Precipitation Intensity</option>
+						            <option value="relairpressure_hpa">Relative Air Pressure</option>
+						            <option value="rh_pct">Relative Humidity</option>
+						            <option value="windspeed_mps">Wind Speed</option>
+						            <option value="winddir_degree">Wind Direction</option>
 						        </select>
+
+								<div id="testplot" style="width:100%;height:400px;"></div>
 						    
-						        <iframe id="WeatherFrame" style="position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0"></iframe>
-						    </div>
+						        <!-- <iframe id="WeatherFrame" style="position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0"></iframe>
+						    </div> -->
 							
-							<div id ="weathermap" class ="tabcontent">
+							<div id ="weathermap" class ="tabcontent" style="text-align:center;">
 								<h3>Weather monitoring sites</h3>
-								<iframe id = "weathermapframe" style = "position:relative; top:0; left:0; width:100%; height:500px;" frameborder="0" 
+								<iframe id = "weathermapframe" style = "width:80%; height:400px; margin: auto;" frameborder="0" 
 								src = "wil_weather_map.html"></iframe>
 							</div>
 								
@@ -177,6 +178,11 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+			<script type="text/javascript" src="jquery.js"></script>
+			<script type = "text/javascript" src = "jquery.csv.js"></script>
+			<script src="https://cdn.plot.ly/plotly-4.1.1.min.js" charset="utf-8"></script>	
+			<script type = "text/javascript" src = "download_data.js"></script>
+			<script type = "text/javascript" src = "create_graph.js"></script>
 
 			<script>
 		        function updateGraph(frameId, selectId) {
